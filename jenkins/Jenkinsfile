@@ -9,7 +9,7 @@ pipeline {
     stage('Build') {
       steps {
         // build en batch mode, tests sautés pour un build rapide
-        sh 'mvn -B -DskipTests=true clean package'
+        sh 'mvn clean install'
       }
     }
   }
