@@ -1,27 +1,21 @@
 pipeline {
   agent any
+  tools {
+    maven 'maven 3.9' 
+    jdk   'jdk17'       // idem pour le JDK
+  }
 
   stages {
-    stage('Setup Tools') {
-      steps {
-        script {
-          def mvnHome = tool name: 'maven 3.9', type: 'hudson.tasks.Maven$MavenInstallation'
-          def jdkHome = tool name: 'jdk 21', type: 'hudson.model.JDK'
-
-          env.PATH = "${mvnHome}/bin:${jdkHome}/bin:${env.PATH}"
-          env.JAVA_HOME = "${jdkHome}"
-        }
-
-        // Debug: confirm correct versions are used
-        sh 'mvn -v'
-        sh 'java -version'
-      }
-    }
-
     stage('Build') {
       steps {
-        sh 'mvn clean package -DskipTests'
+
+        sh 'mvn -B -DskipTests=true clean package'
       }
     }
+  }
+
+  post {
+    success { echo 'Build succeeded' }
+    failure { echo 'Build failed' }
   }
 }
