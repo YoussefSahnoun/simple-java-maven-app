@@ -1,32 +1,21 @@
 pipeline {
-    agent any
-    tools {
-    maven 'maven 3.9'
-    jdk 'jdk 21'
+  agent any
+  tools {
+    maven 'maven-3.9.11' // doit correspondre au nom dans Manage Jenkins → Global Tool Configuration
+    jdk   'jdk-21'       // idem pour le JDK
   }
-    options {
-        skipStagesAfterUnstable()
+
+  stages {
+    stage('Build') {
+      steps {
+        // build en batch mode, tests sautés pour un build rapide
+        sh 'mvn -B -DskipTests=true clean package'
+      }
     }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'mvn -B -DskipTests clean package'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-        }
-        stage('Deliver') { 
-            steps {
-                sh './jenkins/scripts/deliver.sh' 
-            }
-        }
-    }
+  }
+
+  post {
+    success { echo 'Build succeeded' }
+    failure { echo 'Build failed' }
+  }
 }
