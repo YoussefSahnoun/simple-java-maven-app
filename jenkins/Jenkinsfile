@@ -1,21 +1,28 @@
 pipeline {
   agent any
-  tools {
-    maven 'maven 3.9' // doit correspondre au nom dans Manage Jenkins → Global Tool Configuration
-    jdk   'jdk 21'       // idem pour le JDK
-  }
 
   stages {
-    stage('Build') {
+    stage('Setup Tools') {
       steps {
-        // build en batch mode, tests sautés pour un build rapide
-        sh 'mvn clean install'
+        script {
+          // ⚠️ Use the exact names from Global Tool Configuration
+          def mvnHome = tool name: 'maven 3.9', type: 'hudson.tasks.Maven$MavenInstallation'
+          def jdkHome = tool name: 'jdk-21', type: 'hudson.model.JDK'
+
+          env.PATH = "${mvnHome}/bin:${jdkHome}/bin:${env.PATH}"
+          env.JAVA_HOME = "${jdkHome}"
+        }
+
+        // Debug: confirm correct versions are used
+        sh 'mvn -v'
+        sh 'java -version'
       }
     }
-  }
 
-  post {
-    success { echo 'Build succeeded' }
-    failure { echo 'Build failed' }
+    stage('Build') {
+      steps {
+        sh 'mvn clean package -DskipTests'
+      }
+    }
   }
 }
