@@ -5,9 +5,8 @@ pipeline {
     stage('Setup Tools') {
       steps {
         script {
-          // ⚠️ Use the exact names from Global Tool Configuration
           def mvnHome = tool name: 'maven 3.9', type: 'hudson.tasks.Maven$MavenInstallation'
-          def jdkHome = tool name: 'jdk-21', type: 'hudson.model.JDK'
+          def jdkHome = tool name: 'jdk 21', type: 'hudson.model.JDK'
 
           env.PATH = "${mvnHome}/bin:${jdkHome}/bin:${env.PATH}"
           env.JAVA_HOME = "${jdkHome}"
